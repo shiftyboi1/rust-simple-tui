@@ -1,2 +1,2 @@
 
-pub(crate) mod ui;
+pub mod ui;
