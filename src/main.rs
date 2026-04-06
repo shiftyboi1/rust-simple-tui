@@ -2,7 +2,11 @@ use std::io;
 use std::io::stdout;
 use crossterm::{ExecutableCommand};
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen};
-use simple_terminal_select::*
+use simple_terminal_select::*;
+
+// SHIFT YOU BETTER READ THIS 
+// todo add pub function to setup raw mode and enter alt screen so to not add crossterm everywhere
+// todo add command to exit too
 
 fn main() -> io::Result<()> {
     enable_raw_mode()?;
