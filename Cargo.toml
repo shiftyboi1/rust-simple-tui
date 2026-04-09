@@ -1,15 +1,15 @@
 
 [package]
-name = "simple-terminal-select"
+name = "rust-simple-tui"
 version = "0.1.0"
 edition = "2024"
 
 [[bin]]
-name = "simple_terminal_select"
+name = "rust_simple_tui"
 path = "src/main.rs"
 
 [lib]
-name = "simple_terminal_select"
+name = "rust_simple_tui"
 path = "src/lib.rs" 
 
 [dependencies]

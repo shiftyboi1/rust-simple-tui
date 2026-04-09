@@ -39,9 +39,9 @@ impl Menu {
     fn is_selectable(&self, index: usize) -> bool {
         matches!(self.entries[index], MenuEntry::Action{..})
     }
+
     fn move_cursor(&mut self, direction: i32) {
         let mut new_cursor: i32 = self.cursor as i32;
-            // self.cursor = if self.is_selectable(new_cursor as usize) { new_cursor as usize }
         loop {
             new_cursor += direction;
             if new_cursor < 0 || (new_cursor as usize) >= self.entries.len() {

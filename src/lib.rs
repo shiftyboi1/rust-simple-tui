@@ -1,1 +1,1 @@
-pub mod fancyterm;
+pub mod simpletui;
