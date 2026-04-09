@@ -1,8 +1,16 @@
 
 [package]
-name = "firstguy"
+name = "simple-terminal-select"
 version = "0.1.0"
 edition = "2024"
+
+[[bin]]
+name = "simple_terminal_select"
+path = "src/main.rs"
+
+[lib]
+name = "simple_terminal_select"
+path = "src/lib.rs" 
 
 [dependencies]
 crossterm = "0.29.0"
