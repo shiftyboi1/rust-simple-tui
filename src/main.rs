@@ -6,7 +6,6 @@ use simpletui::ui::Menu;
 use rust_simple_tui::*;
 
 // todo add pub function to setup raw mode and enter alt screen so to not add crossterm everywhere
-// todo add command to exit too
 
 fn main() -> io::Result<()> {
     enable_raw_mode()?;
