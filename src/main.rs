@@ -6,13 +6,15 @@ use simpletui::ui::Menu;
 use rust_simple_tui::*;
 
 // todo add pub function to setup raw mode and enter alt screen so to not add crossterm everywhere
+// todo add a function to push a whole ass vector.
+// todo init at a specific index
 
 fn main() -> io::Result<()> {
     enable_raw_mode()?;
     stdout().execute(EnterAlternateScreen)?;
 
     let mut foot: Menu = Menu::new();
-    foot.label("", "|=", " |");
+    foot.label("", "| ", " |");
     foot.label("demomenu", "| ", " |");
     foot.label("", "|=", " |");
     foot.action("An action", "six", "| ", " |");
