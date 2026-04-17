@@ -1,31 +1,25 @@
 use std::io;
-use std::io::stdout;
-use crossterm::{ExecutableCommand};
-use crossterm::terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen};
 use simpletui::ui::Menu;
 use rust_simple_tui::*;
-
-// todo add pub function to setup raw mode and enter alt screen so to not add crossterm everywhere
-// todo add a function to push a whole ass vector.
-// todo init at a specific index
+use rust_simple_tui::simpletui::ui::{enter_tui, leave_tui};
+// todo add a function to push a whole vector.
 
 fn main() -> io::Result<()> {
-    enable_raw_mode()?;
-    stdout().execute(EnterAlternateScreen)?;
+    enter_tui()?;
 
-    let mut foot: Menu = Menu::new();
-    foot.label("", "| ", " |");
-    foot.label("demomenu", "| ", " |");
-    foot.label("", "|=", " |");
-    foot.action("An action", "six", "| ", " |");
-    foot.label("A line", "| ", " |");
-    foot.label("A line", "| ", " |");
-    foot.action("Doggoprint", "doggoprint ", "| ", " |");
-    foot.label("the labler", "| ", " |");
+    let mut foot: Menu = Menu::default();
+    foot.bordered_label("--------------", Some("┌-"), Some("-┐"));
+    foot.bordered_action( "[X]", "" ,Some("| DEMOMENU "), Some(" |"));
+    foot.bordered_label("--------------", Some("├-"), Some("-┤"));
+    foot.bordered_action("An action", "six", Some("| "), Some(" |"));
+    foot.bordered_label("A line", Some("| "), Some(" |"));
+    foot.bordered_label("A line", Some("| "), Some(" |"));
+    foot.bordered_action("Doggoprinter", "doggoprint ", Some("| "), Some(" |"));
+    foot.bordered_label("the labler", Some("| "), Some(" |"));
+    foot.bordered_label("--------------", Some("└-"), Some("-┘"));
 
-    let res=foot.render()?;
-    stdout().execute(LeaveAlternateScreen)?;
-    disable_raw_mode()?;
+    let res=foot.render(3)?;
+    leave_tui()?;
 
     if res == "doggoprint" {
         println!("Doggoprint selected");

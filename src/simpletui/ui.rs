@@ -1,35 +1,66 @@
-use std::cmp::max;
 use std::io;
-use std::io::Write;
+use std::io::{stdout, Write};
 use std::string::ToString;
 use crossterm::{event};
 use crossterm::event::{Event};
 use crossterm::terminal;
+use crossterm::{ExecutableCommand};
+use crossterm::terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen};
 
 enum MenuEntry {
     Label{label: String, header: String, footer: String},
     Action{ label: String, id: String, header: String, footer: String },
 }
 
+#[derive(Default)]
 pub struct Menu {
     entries: Vec<MenuEntry>,
     cursor : usize,
 }
 
+pub fn enter_tui() -> io::Result<()> {
+    enable_raw_mode()?;
+    stdout().execute(EnterAlternateScreen)?;
+    Ok(())
+}
+
+pub fn leave_tui() -> io::Result<()> {
+    stdout().execute(LeaveAlternateScreen)?;
+    disable_raw_mode()?;
+    Ok(())
+}
+
 impl Menu {
-    pub fn new() -> Self {
-        Self {
-            entries: Vec::new(),
-            cursor: 0,
-        }
+
+    pub fn label(&mut self, label: impl Into<String>) {
+        self.bordered_label(label, None, None);
     }
 
-    pub fn label(&mut self, label: impl Into<String>, header: impl Into<String>, footer: impl Into<String>) {
-        self.entries.push(MenuEntry::Label { label: label.into(), header: header.into(), footer: footer.into()});
+    pub fn action(&mut self, label: impl Into<String>, id: impl Into<String>) {
+        self.bordered_action(label, id, None, None);
     }
 
-    pub fn action(&mut self, label: impl Into<String>, id: impl Into<String>, header: impl Into<String>, footer: impl Into<String>) {
-        self.entries.push(MenuEntry::Action{label: label.into(), id: id.into(), header: header.into(), footer: footer.into()});
+    pub fn bordered_label(&mut self, label: impl Into<String>, header: Option<&str>, footer: Option<&str>) {
+        self.entries.push(
+            MenuEntry::Label {
+                label: label.into(),
+                header: header.map(str::to_owned).unwrap_or_default(),
+                footer: footer.map(str::to_owned).unwrap_or_default()
+            }
+        );
+    }
+
+
+
+    pub fn bordered_action(&mut self, label: impl Into<String>, id: impl Into<String>, header: Option<&str>, footer: Option<&str>) {
+        self.entries.push(
+            MenuEntry::Action{
+                label: label.into(),
+                id: id.into(),
+                header: header.map(str::to_owned).unwrap_or_default(),
+                footer: footer.map(str::to_owned).unwrap_or_default()
+            }
+        );
     }
 
     fn select_at_index(&self, index: usize) -> Option<&String> {
@@ -60,36 +91,45 @@ impl Menu {
         // I know magic numbers are evil.
         self.entries.iter().map(|entry| {
             match entry {
-                MenuEntry::Label{label, header, ..} => label.len() + header.len() + 2,
-                MenuEntry::Action{label, header, ..} => label.len() + header.len() + 2,
+                MenuEntry::Label{label, header, ..} => label.chars().count() + header.chars().count(),
+                MenuEntry::Action{label, header, ..} => label.chars().count() + header.chars().count() + 2,
             }
         }).max().unwrap_or(6)
     }
 
     fn prepare_entry(string: &str, max_width: usize, left: &str, right: &str, longest_line: usize, repeat_border: bool) -> Vec<String> {
-        let allowed_strlen = max_width - left.len() - right.len();
-        // TODO take up less ram
-        let chars : Vec<char> = string.chars().collect();
-        let mut output: Vec<String> = Vec::new();
-
-        for (i, chunk) in chars.chunks(allowed_strlen).enumerate() {
-            let line_text: String = chunk.iter().collect();
-            if i == 0 || repeat_border {
-                let padding: usize = max(longest_line - line_text.len() - left.len(), 0);
-                output.push(format!("{}{}{:padding$}{}", left, line_text, "",right));
-                continue
-            }
-            output.push(format!("{:width$}{}", "", line_text, width = left.len()));
+        let allowed_strlen = max_width - left.chars().count() - right.chars().count();
+        if string.is_empty() {
+            let padding = longest_line.saturating_sub(left.chars().count());
+            return vec![format!("{}{:<padding$}{}", left, "", right, padding = padding)];
         }
-        output
+        let chars : Vec<char> = string.chars().collect();
+
+        chars.chunks(allowed_strlen)
+            .enumerate()
+            .map(|(i, chunk)| {
+                let line_text: String = chunk.iter().collect();
+                if i == 0 || repeat_border {
+                    let padding = longest_line.saturating_sub(line_text.chars().count() + left.chars().count());
+                    format!("{}{}{:padding$}{}", left, line_text, "", right, padding = padding)
+                } else {
+                    format!("{:width$}{}", "", line_text, width = left.chars().count())
+                }
+            }
+        ).collect()
     }
 
-    fn prepare_render(&mut self) {
+    fn prepare_render(&mut self, index: usize) {
+        if (index < self.entries.len()) && self.is_selectable(index) {
+            self.cursor = index;
+        } else {
+            self.cursor = 0;
+        }
         while self.cursor < self.entries.len() && !self.is_selectable(self.cursor) {
             self.cursor += 1;
         }
         if self.cursor >= self.entries.len() {
-            self.entries.push(MenuEntry::Action {label: "Exit".to_string(), id: "".to_string(), header: "".to_string(), footer: "".to_string()});
+            self.entries.push(MenuEntry::Action {label: "[X]".to_string(), id: "".to_string(), header: "".to_string(), footer: "".to_string()});
             self.cursor = 0;
         }
     }
@@ -123,7 +163,7 @@ impl Menu {
                 }
             }
 
-            if (print_footer.len() + print_header.len() + 3) as u16 >= width {
+            if (print_footer.chars().count() + print_header.chars().count() + 3) as u16 >= width {
                 crossterm::queue!(out, terminal::Clear(terminal::ClearType::All))?;
                 crossterm::queue!(out, crossterm::cursor::MoveTo(0, 0))?;
                 write!(out, "Unsupported size. Please resize.")?;
@@ -140,8 +180,8 @@ impl Menu {
         out.flush()
     }
 
-    pub fn render(&mut self) -> io::Result<String> {
-        self.prepare_render();
+    pub fn render(&mut self, index: usize) -> io::Result<String> {
+        self.prepare_render(index);
         loop {
             self.render_frame()?;
             if let Event::Key(key) = event::read()? {
