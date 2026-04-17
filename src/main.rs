@@ -2,10 +2,9 @@ use std::io;
 use simpletui::ui::Menu;
 use rust_simple_tui::*;
 use rust_simple_tui::simpletui::ui::{enter_tui, leave_tui};
-// todo add a function to push a whole vector.
+// TODO: Toggle for repeat border
 
 fn main() -> io::Result<()> {
-    enter_tui()?;
 
     let mut foot: Menu = Menu::default();
     foot.bordered_label("--------------", Some("┌-"), Some("-┐"));
@@ -18,6 +17,7 @@ fn main() -> io::Result<()> {
     foot.bordered_label("the labler", Some("| "), Some(" |"));
     foot.bordered_label("--------------", Some("└-"), Some("-┘"));
 
+    enter_tui()?;
     let res=foot.render(3)?;
     leave_tui()?;
 
