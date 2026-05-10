@@ -8,8 +8,8 @@ use crossterm::{ExecutableCommand};
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen};
 
 enum MenuEntry {
-    Label{label: String, header: String, footer: String},
-    Action{ label: String, id: String, header: String, footer: String },
+    Label{label: String, header: String, footer: String, repeat_border: bool},
+    Action{ label: String, id: String, header: String, footer: String, repeat_border: bool},
 }
 
 #[derive(Default)]
@@ -33,32 +33,34 @@ pub fn leave_tui() -> io::Result<()> {
 impl Menu {
 
     pub fn label(&mut self, label: impl Into<String>) {
-        self.bordered_label(label, None, None);
+        self.bordered_label(label, None, None, false);
     }
 
     pub fn action(&mut self, label: impl Into<String>, id: impl Into<String>) {
-        self.bordered_action(label, id, None, None);
+        self.bordered_action(label, id, None, None, false);
     }
 
-    pub fn bordered_label(&mut self, label: impl Into<String>, header: Option<&str>, footer: Option<&str>) {
+    pub fn bordered_label(&mut self, label: impl Into<String>, header: Option<&str>, footer: Option<&str>, repeat_border: bool) {
         self.entries.push(
             MenuEntry::Label {
                 label: label.into(),
                 header: header.map(str::to_owned).unwrap_or_default(),
-                footer: footer.map(str::to_owned).unwrap_or_default()
+                footer: footer.map(str::to_owned).unwrap_or_default(),
+                repeat_border
             }
         );
     }
 
 
 
-    pub fn bordered_action(&mut self, label: impl Into<String>, id: impl Into<String>, header: Option<&str>, footer: Option<&str>) {
+    pub fn bordered_action(&mut self, label: impl Into<String>, id: impl Into<String>, header: Option<&str>, footer: Option<&str>, repeat_border: bool) {
         self.entries.push(
             MenuEntry::Action{
                 label: label.into(),
                 id: id.into(),
                 header: header.map(str::to_owned).unwrap_or_default(),
-                footer: footer.map(str::to_owned).unwrap_or_default()
+                footer: footer.map(str::to_owned).unwrap_or_default(),
+                repeat_border
             }
         );
     }
@@ -129,7 +131,7 @@ impl Menu {
             self.cursor += 1;
         }
         if self.cursor >= self.entries.len() {
-            self.entries.push(MenuEntry::Action {label: "[X]".to_string(), id: "".to_string(), header: "".to_string(), footer: "".to_string()});
+            self.entries.push(MenuEntry::Action {label: "[X]".to_string(), id: "".to_string(), header: "".to_string(), footer: "".to_string(), repeat_border:false});
             self.cursor = 0;
         }
     }
@@ -145,16 +147,19 @@ impl Menu {
         for (i, entry) in self.entries.iter().enumerate() {
             let print_string : String;
             let print_header : &String;
-            let print_footer : &String ;
+            let print_footer : &String;
+            let print_repeat_border : bool;
             match entry {
-                MenuEntry::Label{label, header, footer} => {
+                MenuEntry::Label{label, header, footer, repeat_border} => {
                     print_header = header;
                     print_footer = footer;
-                    print_string = label.to_string()
+                    print_string = label.to_string();
+                    print_repeat_border = *repeat_border;
                 },
-                MenuEntry::Action{label, header, footer, .. } => {
+                MenuEntry::Action{label, header, footer, repeat_border, .. } => {
                     print_header = header;
                     print_footer = footer;
+                    print_repeat_border = *repeat_border;
                     if i == self.cursor {
                         print_string = format!("> {}", label);
                     } else {
@@ -171,7 +176,7 @@ impl Menu {
                 return Ok(());
             }
 
-            for line in Self::prepare_entry(&print_string, width as usize, print_header, print_footer, longest_line, true) {
+            for line in Self::prepare_entry(&print_string, width as usize, print_header, print_footer, longest_line, print_repeat_border) {
                 write!(out, "{}", line)?;
                 newline_index += 1;
                 crossterm::queue!(out, crossterm::cursor::MoveTo(0, newline_index as u16))?
