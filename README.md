@@ -59,7 +59,7 @@ The ```demo_menu``` TUI created earlier should look like this:
 | Label          |
 └----------------┘
 ```
-Note the cursor (```>```) being on the fourth line. This is because the earlier ```.render(3)``` call was passed the index 3, which equates to the 4th item due to the list of items being zero-indexed.
+Note the cursor (```>```) being on the fourth line. This is because the earlier ```.render(3)``` call was passed the index 3, which equates to the 4th item due to the list of items being zero-indexed. In this menu, the ```[X]``` is also selectable due to it being an action, with the text before it being a header.
 
 Actions have a padding of two spaces to allow for the cursor. It is heavily encouraged to keep this line difference consistent, as to make it obvious which entries are selectable and which are not. The cursor can be moved using the up and down arrow keys. To make a selection, press the Enter key.
 
