@@ -9,7 +9,7 @@ intuitive = { git = "https://github.com/shiftyboi1/Intuitive" }
 
 ___
 ## Features
-- **Simplicity** - Instead of making a full-screen TUI requiring management, rust-simple-tui renders a simple UI within a new view in the user's terminal. This makes the UI adaptable to the user's style. The UI is shown using a single command, returning an ID of the selected value, which makes it's implementation trivial.
+- **Simplicity** - Instead of making a full-screen TUI requiring management, Intuitive renders a simple UI within a new view in the user's terminal. This makes the UI adaptable to the user's style. The UI is shown using a single command, returning an ID of the selected value, which makes it's implementation trivial.
 - **Labels and Actions** - A label allows the addition of a non-selectable item into the UI, which can be used as a description, information or decoration.
 - **Header** - An optional string to be rendered at the start of each item in the menu. This will be rendered before the selection cursor.
 - **Footer** - An optional string to be rendered at the end of each item. The library gets the length of the longest line in the menu, and aligns the footers to all start after it, handling alignment automatically.
