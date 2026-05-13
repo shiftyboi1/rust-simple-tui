@@ -3,6 +3,10 @@
 name = "intuitive"
 version = "0.1.0"
 edition = "2024"
+license = "GPL-3.0"
+description = "A simple and lightweight TUI tool for rust"
+repository = "https://github.com/shiftyboi1/Intuitive"
+readme = "README.md"
 
 [[bin]]
 name = "intuitive"

@@ -1,5 +1,12 @@
 # INTUITIVE
 Intuitive is a lightweight tool designed for making quick and simple terminal UIs in Rust. It is to be used for projects like installers, configuration tools and other simple applications where a full-screen TUI would be overkill. It is designed to be as simple as possible, while still being customisable.
+
+To use it, add the following to your Cargo.toml:
+```toml
+[dependencies]
+intuitive = { git = "https://github.com/shiftyboi1/Intuitive" }
+```
+
 ___
 ## Features
 - **Simplicity** - Instead of making a full-screen TUI requiring management, rust-simple-tui renders a simple UI within a new view in the user's terminal. This makes the UI adaptable to the user's style. The UI is shown using a single command, returning an ID of the selected value, which makes it's implementation trivial.
