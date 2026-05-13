@@ -1,15 +1,15 @@
 
 [package]
-name = "rust-simple-tui"
+name = "intuitive"
 version = "0.1.0"
 edition = "2024"
 
 [[bin]]
-name = "rust_simple_tui"
+name = "intuitive"
 path = "src/main.rs"
 
 [lib]
-name = "rust_simple_tui"
+name = "intuitive"
 path = "src/lib.rs" 
 
 [dependencies]

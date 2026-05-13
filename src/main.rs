@@ -1,7 +1,7 @@
 use std::io;
 use simpletui::ui::Menu;
-use rust_simple_tui::*;
-use rust_simple_tui::simpletui::ui::{enter_tui, leave_tui};
+use intuitive::*;
+use intuitive::simpletui::ui::{enter_tui, leave_tui};
 
 fn main() -> io::Result<()> {
 
