@@ -26,7 +26,7 @@ The ```.action(/*...*/)``` and ```.label(/*...*/)``` functions add an item with 
 
    ```rust
     demo_menu.bordered_label("--------------", Some("┌-"), Some("-┐"), false);
-    demo_menu.bordered_action( "[X]", "" ,Some("| DEMOMENU "), Some(" |"), true);
+    demo_menu.bordered_action( "[X]", "" , Some("| DEMOMENU "), Some(" |"), true);
     demo_menu.bordered_label("--------------", Some("├-"), Some("-┤"), false);
     demo_menu.bordered_action("An action", "action", Some("| "), Some(" |"), true);
     demo_menu.bordered_label("A line", Some("| "), Some(" |"), true);
